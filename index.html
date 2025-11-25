@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Love ❤️ — HTML</title>
+  <style>
+    /* reset sederhana */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html,body { height: 100%; font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: linear-gradient(180deg,#1e1f26 0%, #2b2d36 60%); color: #fff; }
+
+    /* container tengah */
+    .wrap {
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      flex-direction: column;
+      padding: 3rem 1rem;
+      text-align: center;
+    }
+
+    /* hati utama menggunakan elemen .heart */
+    .heart {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      transform: rotate(-45deg);
+      cursor: pointer;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.35));
+      animation: float 3s ease-in-out infinite;
+    }
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25), transparent 25%),
+                  linear-gradient(135deg, #ff5f7a 0%, #ff2d86 50%, #b7006a 100%);
+      transition: background 300ms ease, transform 300ms ease;
+    }
+    .heart::before { top: -80px; left: 0; }
+    .heart::after  { left: 80px; top: 0; }
+
+    /* denyut */
+    .heart.pulse { animation: pulse 0.9s infinite ease-in-out; }
+    @keyframes pulse {
+      0% { transform: rotate(-45deg) scale(1); }
+      50% { transform: rotate(-45deg) scale(1.08); }
+      100% { transform: rotate(-45deg) scale(1); }
+    }
+
+    /* floating */
+    @keyframes float {
+      0% { transform: translateY(0) rotate(-45deg); }
+      50% { transform: translateY(-12px) rotate(-45deg); }
+      100% { transform: translateY(0) rotate(-45deg); }
+    }
+
+    /* teks LOVE */
+    h1 {
+      font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+      letter-spacing: 3px;
+      font-weight: 600;
+      margin-top: .5rem;
+      color: #fff;
+      text-shadow: 0 6px 18px rgba(0,0,0,0.45);
+    }
+    p.sub {
+      margin-top: .6rem;
+      opacity: .85;
+      font-size: .95rem;
+      max-width: 38ch;
+      line-height: 1.4;
+      color: rgba(255,255,255,0.9);
+    }
+
+    /* efek hati kecil muncul saat diklik */
+    .particles {
+      position: absolute;
+      pointer-events: none;
+      width: 320px;
+      height: 320px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%,-50%);
+      overflow: visible;
+    }
+    .particle {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      transform: translate(-50%,-50%) rotate(-45deg);
+      opacity: 0;
+      will-change: transform, opacity;
+      background: linear-gradient(135deg,#ff9eb8,#ff3b8d);
+      border-radius: 3px;
+    }
+
+    /* tombol kecil */
+    .hint {
+      margin-top: 1rem;
+      font-size: .85rem;
+      opacity: .85;
+      display: inline-flex;
+      gap: .5rem;
+      align-items: center;
+      background: rgba(255,255,255,0.05);
+      padding: .45rem .7rem;
+      border-radius: 999px;
+      cursor: default;
+      user-select: none;
+    }
+    .small {
+      font-size:.8rem;
+      opacity:.8;
+      color: #fff;
+    }
+
+    /* responsif ukuran hati */
+    @media (max-width:420px) {
+      .heart { width: 120px; height: 120px; }
+      .heart::before, .heart::after { width: 120px; height: 120px; top: -60px; left: 0; }
+      .heart::after { left: 60px; top: 0; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div style="position:relative; width:320px; height:320px;">
+      <div class="heart pulse" id="heart" title="Klik untuk melempar hati kecil!"></div>
+      <div class="particles" id="particles" aria-hidden="true"></div>
+    </div>
+
+    <h1 id="title">I ♥ U</h1>
+    <p class="sub" id="sub">Klik hati di atas untuk melihat efek — atau tahan beberapa detik untuk membuatnya berdenyut terus.</p>
+    <div class="hint small">Klik → efek | Klik dan tahan → toggle denyut</div>
+  </main>
+
+  <script>
+    // referensi elemen
+    const heart = document.getElementById('heart');
+    const particles = document.getElementById('particles');
+    const title = document.getElementById('title');
+
+    // toggle kelas pulse saat mousedown (tahan) / mouseup
+    let pulseOn = true;
+    heart.addEventListener('mousedown', () => {
+      pulseOn = !pulseOn;
+      heart.classList.toggle('pulse', pulseOn);
+    });
+
+    // function untuk membuat partikel hati kecil
+    function spawnParticles(x=160, y=160, count=12) {
+      for (let i=0;i<count;i++){
+        const p = document.createElement('div');
+        p.className = 'particle';
+        particles.appendChild(p);
+
+        // acak posisi awal sedikit di tengah
+        p.style.left = x + (Math.random()*40-20) + 'px';
+        p.style.top  = y + (Math.random()*40-20) + 'px';
+
+        // acak arah & jarak
+        const angle = Math.random()*Math.PI*2;
+        const dist = 60 + Math.random()*120;
+        const targetX = x + Math.cos(angle)*dist;
+        const targetY = y + Math.sin(angle)*dist;
+
+        // acak ukuran & rotasi
+        const size = 8 + Math.random()*12;
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        p.style.transform = 'translate(-50%,-50%) rotate(-45deg) scale(.6)';
+
+        // animasi manual lewat requestAnimationFrame
+        const duration = 600 + Math.random()*600;
+        const start = performance.now();
+        (function animate(t){
+          const elapsed = t - start;
+          const fraction = Math.min(1, elapsed / duration);
+          // ease out
+          const ease = 1 - Math.pow(1 - fraction, 3);
+          p.style.left = (x + (targetX - x) * ease) + 'px';
+          p.style.top  = (y + (targetY - y) * ease) + 'px';
+          p.style.opacity = String(1 - ease);
+          p.style.transform = `translate(-50%,-50%) rotate(${ -45 + ease*360 }deg) scale(${0.6 + ease*0.6})`;
+
+          if (fraction < 1) requestAnimationFrame(animate);
+          else p.remove();
+        })(performance.now());
+      }
+    }
+
+    // klik akan melempar partikel
+    heart.addEventListener('click', (ev) => {
+      // posisi click relatif ke container (particles area 320x320)
+      const rect = ev.currentTarget.getBoundingClientRect();
+      // center-based coords inside particles element
+      const parentRect = particles.getBoundingClientRect();
+      const x = (rect.left + rect.width/2) - parentRect.left;
+      const y = (rect.top  + rect.height/2) - parentRect.top;
+
+      spawnParticles(x, y, 14);
+      // efek teks sementara
+      title.textContent = ["I ♥ U","Love","Sayang","Cintaku","I Love You"][Math.floor(Math.random()*5)];
+      setTimeout(()=> title.textContent = "I ♥ U", 1800);
+    });
+
+    // buat hati berkedip pelan saat first load, lalu tetap pulse
+    setTimeout(()=> {
+      heart.classList.add('pulse');
+    }, 700);
+
+    // aksesibilitas: keyboard support (enter/space)
+    heart.setAttribute('tabindex', '0');
+    heart.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        heart.click();
+      }
+      if (e.key === 'p' || e.key === 'P') {
+        pulseOn = !pulseOn;
+        heart.classList.toggle('pulse', pulseOn);
+      }
+    });
+  </script>
+</body>
+</html>
